@@ -1,0 +1,75 @@
+name: Build kernel deb packages
+on:
+  workflow_dispatch:
+  push:
+
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: 1.35.0
+            fetch_url: https://busybox.net/downloads/busybox-1.35.0.tar.bz2
+            config: config-1.35.0
+    name: Build kernel
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Update and Upgrade
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt install zstd tree wget curl -y
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 4096
+          swap-size-mb: 512
+          remove-dotnet: 'true'
+          remove-android: 'true'
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download source
+        run: |
+          fetch_url=${{ matrix.fetch_url }}
+          if [ -z "$fetch_url" ]; then
+            fetch_url=https://busybox.net/downloads/busybox-${{ matrix.version }}.tar.bz2
+          fi
+
+          wget ${fetch_url}
+          tar -xvf busybox-*.tar.bz2
+          mv busybox-* busybox
+
+      - name: start docker and build 
+        run: |
+          ls -al ${{ github.workspace }} 
+          if [ ! -f ${{ matrix.config }} ]; then
+            echo "config file not found"
+            exit 1
+          fi
+
+          chmod +x ${{ github.workspace }}/docker-entrypoint.sh 
+          docker run --rm --user root --env VERSION=${{ matrix.version }} \
+            --env CONFIG=${{ matrix.config }} \
+            -v ${{ github.workspace }}/busybox/:/busybox/ \
+            -v ${{ github.workspace }}/${{ matrix.config }}:/config-${{ matrix.version }} \
+            -v ${{ github.workspace }}/docker-entrypoint.sh:/docker-entrypoint.sh \
+            -v ${{ github.workspace }}/patch.d/:/patch.d/ \
+            -v ${{ github.workspace }}/files/:/files/ \
+            -v ${{ github.workspace }}/post_install.d/:/post_install.d/ \
+            gcc "/docker-entrypoint.sh"
+
+      - name: prepare artifact
+        run: |
+          cd ${{ github.workspace }}
+          sudo du -h --max-depth=1
+          tree .
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: busybox-${{ matrix.version }}
+          path: ${{ github.workspace }}/files/output/rootfs.cpio
