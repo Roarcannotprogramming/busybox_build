@@ -40,8 +40,8 @@ jobs:
           fi
 
           wget ${fetch_url}
-          tar -xvf busybox-*.tar.bz2
-          mv busybox-* busybox
+          tar -xvf busybox-${{ matrix.version }}.tar.bz2
+          mv busybox-${{ matrix.version }} busybox
 
       - name: start docker and build 
         run: |
