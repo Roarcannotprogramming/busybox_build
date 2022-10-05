@@ -63,6 +63,7 @@ jobs:
               -v ${{ github.workspace }}/docker-glibc-entrypoint.sh:/docker-glibc-entrypoint.sh \
               gcc "/docker-glibc-entrypoint.sh"
           fi
+          tree ${{ github.workspace }}/files/
 
       - name: start docker and build 
         run: |
