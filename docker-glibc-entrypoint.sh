@@ -12,9 +12,9 @@ mkdir -p /build
 cd /build || exit 1
 
 # configure
-/glibc/configure --prefix=/files/usr --with-tls --enable-add-ons=nptl
+/glibc/configure --prefix=/usr --with-tls --enable-add-ons=nptl
 
 # make & make install
 make -j$(nproc)
-make install
+make install DESTDIR=/files/usr
 
