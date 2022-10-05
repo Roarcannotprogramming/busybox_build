@@ -1,5 +1,5 @@
 #! /bin/bash
 
 if [ -d /files/usr ]; then
-    cp -r /files/usr .
+    cp -r /files/* .
 fi
