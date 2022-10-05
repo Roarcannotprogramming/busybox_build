@@ -16,5 +16,5 @@ cd /build || exit 1
 
 # make & make install
 make -j$(nproc)
-make install DESTDIR=/files/usr
+make install DESTDIR=/files
 
