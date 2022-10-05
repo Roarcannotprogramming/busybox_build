@@ -13,6 +13,7 @@ jobs:
           - version: 1.35.0
             fetch_url: https://busybox.net/downloads/busybox-1.35.0.tar.bz2
             config: config-1.35.0
+            glibc_version: 2.36
     name: Build kernel
     runs-on: ubuntu-22.04
     steps:
@@ -42,6 +43,26 @@ jobs:
           wget ${fetch_url}
           tar -xvf busybox-${{ matrix.version }}.tar.bz2
           mv busybox-${{ matrix.version }} busybox
+
+          glibc_version=${{ matrix.glibc_version }}
+          if [ -n "$glibc_version" ]; then
+            wget http://ftp.gnu.org/gnu/libc/glibc-${glibc_version}.tar.gz
+            tar -xvf glibc-${glibc_version}.tar.gz
+            mv glibc-${glibc_version} glibc
+          fi
+
+      - name: build glibc
+        run: |
+          glibc_version=${{ matrix.glibc_version }}
+          if [ -n "$glibc_version" ]; then
+            ls -al ${{ github.workspace }} 
+            chmod +x ${{ github.workspace }}/docker-glibc-entrypoint.sh
+            docker run --rm --user root \
+              -v ${{ github.workspace }}/files/:/files/ \
+              -v ${{ github.workspace }}/glibc/:/glibc/ \
+              -v ${{ github.workspace }}/docker-glibc-entrypoint.sh:/docker-glibc-entrypoint.sh \
+              gcc "/docker-glibc-entrypoint.sh"
+          fi
 
       - name: start docker and build 
         run: |
