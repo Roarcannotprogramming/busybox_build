@@ -14,6 +14,10 @@ jobs:
             fetch_url: https://busybox.net/downloads/busybox-1.35.0.tar.bz2
             config: config-1.35.0
             glibc_version: 2.36
+          - version: 1.37.0
+            fetch_url: https://busybox.net/downloads/busybox-1.37.0.tar.bz2
+            config: config-1.35.0
+            glibc_version: 2.39
     name: Build kernel
     runs-on: ubuntu-22.04
     steps:
