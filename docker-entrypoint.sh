@@ -15,6 +15,7 @@ for patch in /patch.d/*; do
 done
 
 # build busybox
+make oldconfig
 make -j$(nproc)
 make install
 
