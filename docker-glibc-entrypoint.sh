@@ -15,6 +15,7 @@ cd /build || exit 1
 /glibc/configure --prefix=/usr --with-tls --enable-add-ons=nptl
 
 # make & make install
+make oldconfig
 make -j$(nproc)
 make install DESTDIR=/files
 
