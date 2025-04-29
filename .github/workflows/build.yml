@@ -31,7 +31,7 @@ jobs:
           remove-android: 'true'
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download source
         run: |
@@ -91,7 +91,7 @@ jobs:
           tree .
 
       - name: Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: busybox-${{ matrix.version }}
           path: ${{ github.workspace }}/files/output/rootfs.cpio
